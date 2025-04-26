@@ -19,16 +19,6 @@ const userSchema = new mongoose.Schema({
     enum: ["user", "admin"],
     default: "user",
   },
-  isVerified: {
-    type: Boolean,
-    default: false
-  },
-  verificationToken: {
-    type: String,
-  },
-  verificationTokenExpiry: {
-    type: Date,
-  },
   posts: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: "Post",

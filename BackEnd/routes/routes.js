@@ -3,7 +3,6 @@ import { createUser, loginUser, logoutUser } from "../controller/user.controller
 import { createPost, getPosts, getPostById, updatePost, deletePost, getPostsByUser } from "../controller/post.controller.js";
 import { auth } from "../middleware/auth.js";
 import { roleAuth } from "../middleware/roleAuth.js";
-import { verifyEmail } from "../controller/user.controller.js";
 const router = express.Router();
 
 console.log("Routes loaded");
@@ -12,9 +11,6 @@ console.log("Routes loaded");
 router.post("/signup", createUser);
 router.post("/login", loginUser);
 router.post("/logout", logoutUser);
-
-// Email Verification route
-router.get("/api/verifyEmail", verifyEmail);
 
 // Post routes
 // Public routes - anyone can view posts

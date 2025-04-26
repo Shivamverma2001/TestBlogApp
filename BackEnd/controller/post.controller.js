@@ -1,6 +1,5 @@
 import Post from "../models/post.model.js";
 import User from "../models/user.model.js";
-import { roleAuth } from "../middleware/roleAuth.js";
 
 export const createPost = async (req, res) => {
   try {
@@ -36,10 +35,22 @@ export const getPosts = async (req, res) => {
       .populate("author", "name")
       .lean();
 
+    // Add isLiked field to each post
+    const postsWithLikeInfo = posts.map(post => {
+      const likesCount = post.likes ? post.likes.length : 0;
+      const isLiked = req.user ? post.likes?.some(likeId => likeId.toString() === req.user._id.toString()) : false;
+      
+      return {
+        ...post,
+        isLiked,
+        likes: likesCount
+      };
+    });
+
     const totalPosts = await Post.countDocuments();
 
     res.status(200).json({
-      posts,
+      posts: postsWithLikeInfo,
       currentPage: page,
       totalPages: Math.ceil(totalPosts / limit),
       hasMore: skip + posts.length < totalPosts
@@ -133,6 +144,116 @@ export const getPostsByUser = async (req, res) => {
   } catch (error) {
     console.error('Error fetching user posts:', error);
     res.status(500).json({ message: 'Error fetching user posts' });
+  }
+};
+
+// Add likePost function to handle post likes
+export const likePost = async (req, res) => {
+  try {
+    const postId = req.params.id;
+    const userId = req.user._id; // Assuming you have user info in req.user from auth middleware
+
+    const post = await Post.findById(postId);
+    if (!post) {
+      return res.status(404).json({ message: 'Post not found' });
+    }
+
+    const isLiked = post.likes.includes(userId);
+    
+    if (isLiked) {
+      // Unlike the post
+      post.likes = post.likes.filter(id => !id.equals(userId));
+    } else {
+      // Like the post
+      post.likes.push(userId);
+    }
+
+    await post.save();
+
+    res.json({
+      likes: post.likes.length,
+      isLiked: !isLiked
+    });
+  } catch (error) {
+    console.error('Error in likePost:', error);
+    res.status(500).json({ message: 'Error processing like' });
+  }
+};
+
+// Modify getAllPosts to include like information
+export const getAllPosts = async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+
+    const posts = await Post.find()
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .populate('author', 'name')
+      .lean();
+
+    // Add isLiked field to each post
+    const postsWithLikeInfo = posts.map(post => {
+      const likesCount = post.likes ? post.likes.length : 0;
+      const isLiked = req.user ? post.likes?.some(likeId => likeId.toString() === req.user._id.toString()) : false;
+      
+      return {
+        ...post,
+        isLiked,
+        likes: likesCount
+      };
+    });
+
+    res.json({
+      posts: postsWithLikeInfo,
+      currentPage: page,
+      totalPages: Math.ceil(await Post.countDocuments() / limit),
+      hasMore: skip + posts.length < await Post.countDocuments()
+    });
+  } catch (error) {
+    console.error('Error in getAllPosts:', error);
+    res.status(500).json({ message: 'Error fetching posts' });
+  }
+};
+
+export const addComment = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { content } = req.body;
+    const userId = req.user._id;
+
+    const post = await Post.findById(id);
+    if (!post) {
+      return res.status(404).json({ message: 'Post not found' });
+    }
+
+    // Get user details to store name
+    const user = await User.findById(userId).select('name');
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    const newComment = {
+      content,
+      author: {
+        _id: userId,
+        name: user.name
+      },
+      createdAt: new Date()
+    };
+
+    post.comments.push(newComment);
+    await post.save();
+
+    // Get the newly added comment
+    const addedComment = post.comments[post.comments.length - 1];
+    
+    res.status(201).json(addedComment);
+  } catch (error) {
+    console.error('Error adding comment:', error);
+    res.status(500).json({ message: 'Error adding comment' });
   }
 };
 

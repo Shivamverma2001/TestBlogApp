@@ -265,17 +265,19 @@ const AdminDashboard = () => {
                 className="relative bg-white rounded-2xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto scrollbar-hide transform transition-all duration-200"
                 onClick={e => e.stopPropagation()}
               >
-                <div className="absolute top-4 right-4">
+                {/* Modal Header */}
+                <div className="flex items-center justify-between border-b border-gray-200 p-6">
+                  <h2 className="text-2xl font-bold text-gray-900">{previewPost.title}</h2>
                   <button
                     onClick={handleClosePreview}
-                    className="text-gray-400 hover:text-gray-500 transition-colors p-2 hover:bg-gray-100 rounded-full"
+                    className="text-gray-400 hover:text-gray-500 transition-colors p-2 hover:bg-gray-100 rounded-full flex-shrink-0 ml-4"
                   >
                     <FaTimes className="h-6 w-6" />
                   </button>
                 </div>
 
+                {/* Modal Body */}
                 <div className="p-6">
-                  <h2 className="text-2xl font-bold text-gray-900 mb-4">{previewPost.title}</h2>
                   <div className="prose max-w-none">
                     <p className="text-gray-700 whitespace-pre-line">{previewPost.content}</p>
                   </div>

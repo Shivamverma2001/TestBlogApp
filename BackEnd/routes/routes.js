@@ -1,6 +1,6 @@
 import express from "express";
 import { createUser, loginUser, logoutUser } from "../controller/user.controller.js";
-import { createPost, getPosts, getPostById, updatePost, deletePost, getPostsByUser } from "../controller/post.controller.js";
+import { createPost, getPosts, getPostById, updatePost, deletePost, getPostsByUser, likePost, addComment } from "../controller/post.controller.js";
 import { auth } from "../middleware/auth.js";
 import { roleAuth } from "../middleware/roleAuth.js";
 const router = express.Router();
@@ -17,6 +17,8 @@ router.post("/logout", logoutUser);
 router.get("/posts", auth, getPosts);
 router.get("/posts/user", auth, getPostsByUser);
 router.get("/posts/:id", auth, getPostById);
+router.post("/posts/:id/like", auth, likePost);
+router.post("/posts/:id/comments", auth, addComment);
 
 // Protected routes - only admin can create, update, or delete posts
 router.post("/posts", auth,roleAuth, createPost);

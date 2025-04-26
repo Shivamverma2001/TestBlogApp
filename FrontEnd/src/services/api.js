@@ -172,14 +172,9 @@ export const postService = {
     }
   },
 
-  addComment: async (postId, commentData) => {
-    try {
-      const response = await api.post(`/api/posts/${postId}/comments`, commentData);
-      return response.data;
-    } catch (error) {
-      console.error('Error adding comment:', error);
-      throw error;
-    }
+  addComment: async (postId, content) => {
+    const response = await api.post(`/api/posts/${postId}/comments`, { content });
+    return response.data;
   }
 };
 

@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Link } from 'react-router-dom';
-import { FaHeart, FaComment, FaShare, FaBookmark, FaNewspaper } from 'react-icons/fa';
+import { FaHeart, FaComment, FaRegHeart } from 'react-icons/fa';
 import { postService } from '../services/api';
 import Header from '../components/Header';
+import { FaNewspaper } from 'react-icons/fa';
 
 const EmptyState = () => (
   <div className="min-h-[60vh] flex flex-col items-center justify-center text-center px-4">
@@ -22,7 +22,49 @@ const BlogPosts = () => {
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
+  const [commentText, setCommentText] = useState('');
+  const [activeCommentPost, setActiveCommentPost] = useState(null);
+  const [commentsToShow, setCommentsToShow] = useState({}); // Track number of comments to show per post
   const observer = useRef();
+
+  const handleLike = async (postId) => {
+    try {
+      const updatedPost = await postService.likePost(postId);
+      setPosts(prevPosts => 
+        prevPosts.map(post => 
+          post._id === postId 
+            ? { ...post, likes: updatedPost.likes, isLiked: updatedPost.isLiked }
+            : post
+        )
+      );
+    } catch (error) {
+      console.error('Error liking post:', error);
+    }
+  };
+
+  const handleComment = async (postId) => {
+    try {
+      if (!commentText.trim()) return;
+      
+      const newComment = await postService.addComment(postId, commentText);
+      
+      setPosts(prevPosts => 
+        prevPosts.map(post => 
+          post._id === postId 
+            ? { 
+                ...post, 
+                comments: [...(post.comments || []), newComment] 
+              }
+            : post
+        )
+      );
+      
+      setCommentText('');
+      setActiveCommentPost(null);
+    } catch (error) {
+      console.error('Error adding comment:', error);
+    }
+  };
 
   const fetchPosts = async () => {
     try {
@@ -90,6 +132,25 @@ const BlogPosts = () => {
     }).format(date);
   };
 
+  const handleShowMoreComments = (postId, totalComments) => {
+    setCommentsToShow(prev => ({
+      ...prev,
+      [postId]: Math.min((prev[postId] || 1) + 5, totalComments)
+    }));
+  };
+
+  const getVisibleComments = (comments, postId) => {
+    if (!comments || comments.length === 0) return [];
+    
+    // If not in commentsToShow, show only 1 comment
+    if (!commentsToShow[postId]) {
+      return comments.slice(-1);
+    }
+    
+    // Show the number of comments specified in commentsToShow
+    return comments.slice(-commentsToShow[postId]);
+  };
+
   if (loading && posts.length === 0) {
     return (
       <div className="min-h-screen bg-gray-50">
@@ -151,31 +212,54 @@ const BlogPosts = () => {
 
                   {/* Post Actions */}
                   <div className="px-4 py-3 border-t border-gray-100 bg-gray-50">
-                    <div className="flex items-center justify-between">
-                      <div className="flex space-x-4">
-                        <button className="flex items-center space-x-1 text-gray-600 hover:text-red-500 transition-colors">
-                          <FaHeart className="w-5 h-5" />
-                          <span>{post.likes || 0}</span>
-                        </button>
-                        <button className="flex items-center space-x-1 text-gray-600 hover:text-blue-500 transition-colors">
-                          <FaComment className="w-5 h-5" />
-                          <span>{post.comments?.length || 0}</span>
-                        </button>
-                        <button className="flex items-center space-x-1 text-gray-600 hover:text-green-500 transition-colors">
-                          <FaShare className="w-5 h-5" />
-                        </button>
-                      </div>
-                      <button className="text-gray-600 hover:text-yellow-500 transition-colors">
-                        <FaBookmark className="w-5 h-5" />
+                    <div className="flex items-center space-x-4">
+                      <button 
+                        onClick={() => handleLike(post._id)}
+                        className="flex items-center space-x-1 text-gray-600 hover:text-red-500 transition-colors"
+                      >
+                        {post.isLiked ? (
+                          <FaHeart className="w-5 h-5 text-red-500" />
+                        ) : (
+                          <FaRegHeart className="w-5 h-5" />
+                        )}
+                        <span>{post.likes || 0}</span>
+                      </button>
+                      <button 
+                        onClick={() => setActiveCommentPost(activeCommentPost === post._id ? null : post._id)}
+                        className="flex items-center space-x-1 text-gray-600 hover:text-blue-500 transition-colors"
+                      >
+                        <FaComment className="w-5 h-5" />
+                        <span>{post.comments?.length || 0}</span>
                       </button>
                     </div>
                   </div>
+
+                  {/* Comment Input */}
+                  {activeCommentPost === post._id && (
+                    <div className="px-4 py-3 border-t border-gray-100">
+                      <div className="flex space-x-2">
+                        <input
+                          type="text"
+                          value={commentText}
+                          onChange={(e) => setCommentText(e.target.value)}
+                          placeholder="Write a comment..."
+                          className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        />
+                        <button
+                          onClick={() => handleComment(post._id)}
+                          className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+                        >
+                          Post
+                        </button>
+                      </div>
+                    </div>
+                  )}
 
                   {/* Comments Section */}
                   {post.comments && post.comments.length > 0 && (
                     <div className="px-4 py-2 border-t border-gray-100">
                       <div className="space-y-2">
-                        {post.comments.slice(0, 2).map((comment, index) => (
+                        {getVisibleComments(post.comments, post._id).map((comment, index) => (
                           <div key={index} className="flex items-start space-x-2">
                             <div className="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center">
                               <span className="text-xs text-gray-600">
@@ -187,12 +271,19 @@ const BlogPosts = () => {
                                 <span className="font-semibold">{comment.author?.name || 'Anonymous'}</span>
                                 <span className="text-gray-700 ml-2">{comment.content}</span>
                               </p>
+                              <p className="text-xs text-gray-500">
+                                {formatDate(comment.createdAt)}
+                              </p>
                             </div>
                           </div>
                         ))}
-                        {post.comments.length > 2 && (
-                          <button className="text-sm text-gray-500 hover:text-blue-500">
-                            View all {post.comments.length} comments
+                        
+                        {post.comments.length > (commentsToShow[post._id] || 1) && (
+                          <button 
+                            onClick={() => handleShowMoreComments(post._id, post.comments.length)}
+                            className="text-sm text-blue-500 hover:text-blue-600 font-medium mt-2"
+                          >
+                            Show More Comments ({post.comments.length - (commentsToShow[post._id] || 1)} remaining)
                           </button>
                         )}
                       </div>

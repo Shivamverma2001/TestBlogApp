@@ -78,6 +78,7 @@ Create a `.env` file in the Backend directory with the following variables:
 PORT=3000
 MONGODB_URI=mongodb://localhost:27017/blogapp
 JWT_SECRET=your_jwt_secret_key
+NODE_ENV=development
 ```
 
 ### 4. Install Frontend Dependencies

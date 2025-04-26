@@ -1,7 +1,10 @@
 import axios from 'axios';
 
-// Use environment variable for API base URL
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+// Get the current hostname to determine if we're in production
+const isProduction = window.location.hostname !== 'localhost';
+const API_BASE_URL = isProduction 
+  ? 'https://testblogapp-sfqs.onrender.com'  // Production URL
+  : import.meta.env.VITE_API_URL || 'http://localhost:3000';  // Development URL
 
 const api = axios.create({
   baseURL: API_BASE_URL,

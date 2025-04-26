@@ -114,69 +114,13 @@ The development application will be available at:
 - Frontend: http://localhost:5173
 - Backend: http://localhost:3000
 
-## Production Setup
+### Production Environment
 
-### 1. Backend Configuration
+The application is deployed at:
+- Frontend: https://testblogapp-sfqs.onrender.com
+- Backend: https://testblogapp-sfqs.onrender.com
 
-Create a `.env` file in the root directory with production values:
-
-```env
-PORT=3000
-MONGODB_URI=your_production_mongodb_uri
-JWT_SECRET=your_production_jwt_secret
-NODE_ENV=production
-```
-
-### 2. Frontend Configuration
-
-Create a `.env.production` file in the FrontEnd directory:
-
-```env
-VITE_API_URL=https://your-production-api-url.com
-```
-
-### 3. Build and Deploy
-
-#### Build Frontend
-
-```bash
-cd FrontEnd
-npm run build
-```
-
-The build output will be in the `dist` directory.
-
-#### Deploy Backend
-
-```bash
-npm install --production
-npm start
-```
-
-### 4. Production Environment Variables
-
-Make sure to set these environment variables in your production environment:
-
-```bash
-# Backend
-export PORT=3000
-export MONGODB_URI=your_production_mongodb_uri
-export JWT_SECRET=your_production_jwt_secret
-export NODE_ENV=production
-
-# Frontend (if using a build tool that requires these)
-export VITE_API_URL=https://your-production-api-url.com
-```
-
-### 5. Production Considerations
-
-- Use a process manager like PM2 for Node.js applications
-- Set up proper SSL certificates
-- Configure proper CORS settings
-- Set up proper logging and monitoring
-- Use a CDN for static assets
-- Implement proper security headers
-- Set up automated backups for the database
+For production deployment, no additional environment configuration is needed as the API URL is automatically determined based on the hostname.
 
 ## Project Structure
 

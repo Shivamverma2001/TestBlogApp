@@ -73,12 +73,14 @@ const BlogPosts = () => {
       const newPosts = Array.isArray(response) ? response : [];
       const morePosts = response.hasMore || false;
       
-      // Only add new posts that don't already exist
-      setPosts(prevPosts => {
-        const existingIds = new Set(prevPosts.map(post => post._id));
-        const uniqueNewPosts = newPosts.filter(post => !existingIds.has(post._id));
-        return [...prevPosts, ...uniqueNewPosts];
-      });
+      // Only update if we have new posts
+      if (newPosts.length > 0) {
+        setPosts(prevPosts => {
+          const existingIds = new Set(prevPosts.map(post => post._id));
+          const uniqueNewPosts = newPosts.filter(post => !existingIds.has(post._id));
+          return uniqueNewPosts.length > 0 ? [...prevPosts, ...uniqueNewPosts] : prevPosts;
+        });
+      }
       setHasMore(morePosts);
     } catch (error) {
       console.error('Error fetching posts:', error);

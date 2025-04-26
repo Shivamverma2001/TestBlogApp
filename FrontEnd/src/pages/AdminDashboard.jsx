@@ -182,47 +182,54 @@ const AdminDashboard = () => {
               {posts.map((post) => (
                 <div
                   key={post._id}
-                  className="bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-200 border border-gray-100 hover:border-indigo-100 transform hover:-translate-y-1"
+                  className="bg-white rounded-xl shadow-sm transition-all duration-200 border border-gray-100 hover:shadow-lg hover:border-indigo-200 h-[250px]"
                 >
-                  <div className="p-6">
-                    <div className="flex items-start justify-between">
-                      <h3 className="text-lg font-semibold text-gray-900 line-clamp-1 hover:line-clamp-none transition-all duration-200">
-                        {post.title}
-                      </h3>
+                  <div className="p-6 flex flex-col h-full">
+                    <div className="flex-grow overflow-hidden">
+                      <div className="flex items-start justify-between">
+                        <h3 className="text-lg font-semibold text-gray-900 line-clamp-1">
+                          {post.title}
+                        </h3>
+                      </div>
+                      <p className="mt-2 text-sm text-gray-600 line-clamp-4">
+                        {post.content}
+                      </p>
                     </div>
-                    <p className="mt-2 text-sm text-gray-600 line-clamp-3 hover:line-clamp-none transition-all duration-200">
-                      {post.content}
-                    </p>
-                    <div className="mt-4 flex items-center text-sm text-gray-500">
-                      <FaCalendar className="mr-2 text-indigo-500" />
-                      {new Date(post.createdAt).toLocaleDateString('en-US', {
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric'
-                      })}
-                    </div>
-                    <div className="mt-4 flex justify-end space-x-3">
-                      <button
-                        onClick={() => handlePreviewPost(post)}
-                        className="text-blue-600 hover:text-blue-800 transition-colors p-2 hover:bg-blue-50 rounded-full"
-                        title="Preview"
-                      >
-                        <FaEye className="h-5 w-5" />
-                      </button>
-                      <button
-                        onClick={() => handleEditPost(post)}
-                        className="text-indigo-600 hover:text-indigo-800 transition-colors p-2 hover:bg-indigo-50 rounded-full"
-                        title="Edit"
-                      >
-                        <FaEdit className="h-5 w-5" />
-                      </button>
-                      <button
-                        onClick={() => handleDeletePost(post._id)}
-                        className="text-red-600 hover:text-red-800 transition-colors p-2 hover:bg-red-50 rounded-full"
-                        title="Delete"
-                      >
-                        <FaTrash className="h-5 w-5" />
-                      </button>
+                    
+                    <div className="pt-4 border-t border-gray-100">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center text-sm text-gray-500">
+                          <FaCalendar className="mr-2 text-indigo-500" />
+                          {new Date(post.createdAt).toLocaleDateString('en-US', {
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric'
+                          })}
+                        </div>
+                        <div className="flex space-x-2">
+                          <button
+                            onClick={() => handlePreviewPost(post)}
+                            className="text-blue-600 hover:text-blue-800 transition-colors p-2 hover:bg-blue-50 rounded-full"
+                            title="Preview"
+                          >
+                            <FaEye className="h-4 w-4" />
+                          </button>
+                          <button
+                            onClick={() => handleEditPost(post)}
+                            className="text-indigo-600 hover:text-indigo-800 transition-colors p-2 hover:bg-indigo-50 rounded-full"
+                            title="Edit"
+                          >
+                            <FaEdit className="h-4 w-4" />
+                          </button>
+                          <button
+                            onClick={() => handleDeletePost(post._id)}
+                            className="text-red-600 hover:text-red-800 transition-colors p-2 hover:bg-red-50 rounded-full"
+                            title="Delete"
+                          >
+                            <FaTrash className="h-4 w-4" />
+                          </button>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>

@@ -54,7 +54,7 @@ Before you begin, ensure you have the following installed:
 - npm (v6 or higher)
 - MongoDB (v4.4 or higher)
 
-## Installation
+## Development Setup
 
 ### 1. Clone the Repository
 
@@ -66,18 +66,17 @@ cd BlogApplication
 ### 2. Install Backend Dependencies
 
 ```bash
-cd Backend
 npm install
 ```
 
-### 3. Configure Backend Environment
+### 3. Configure Backend Environment (Development)
 
-Create a `.env` file in the Backend directory with the following variables:
+Create a `.env` file in the root directory with the following variables:
 
 ```env
 PORT=3000
 MONGODB_URI=mongodb://localhost:27017/blogapp
-JWT_SECRET=your_jwt_secret_key
+JWT_SECRET=your_development_jwt_secret
 NODE_ENV=development
 ```
 
@@ -85,10 +84,10 @@ NODE_ENV=development
 
 ```bash
 cd FrontEnd
-npm i
+npm install
 ```
 
-### 5. Configure Frontend Environment
+### 5. Configure Frontend Environment (Development)
 
 Create a `.env` file in the FrontEnd directory with the following variables:
 
@@ -96,13 +95,11 @@ Create a `.env` file in the FrontEnd directory with the following variables:
 VITE_API_URL=http://localhost:3000
 ```
 
-### 6. Start the Development Servers
+### 6. Start Development Servers
 
 #### Start the Backend Server
 
 ```bash
-cd Backend
-npm i
 npm run dev
 ```
 
@@ -113,9 +110,73 @@ cd FrontEnd
 npm run dev
 ```
 
-The application will be available at:
+The development application will be available at:
 - Frontend: http://localhost:5173
 - Backend: http://localhost:3000
+
+## Production Setup
+
+### 1. Backend Configuration
+
+Create a `.env` file in the root directory with production values:
+
+```env
+PORT=3000
+MONGODB_URI=your_production_mongodb_uri
+JWT_SECRET=your_production_jwt_secret
+NODE_ENV=production
+```
+
+### 2. Frontend Configuration
+
+Create a `.env.production` file in the FrontEnd directory:
+
+```env
+VITE_API_URL=https://your-production-api-url.com
+```
+
+### 3. Build and Deploy
+
+#### Build Frontend
+
+```bash
+cd FrontEnd
+npm run build
+```
+
+The build output will be in the `dist` directory.
+
+#### Deploy Backend
+
+```bash
+npm install --production
+npm start
+```
+
+### 4. Production Environment Variables
+
+Make sure to set these environment variables in your production environment:
+
+```bash
+# Backend
+export PORT=3000
+export MONGODB_URI=your_production_mongodb_uri
+export JWT_SECRET=your_production_jwt_secret
+export NODE_ENV=production
+
+# Frontend (if using a build tool that requires these)
+export VITE_API_URL=https://your-production-api-url.com
+```
+
+### 5. Production Considerations
+
+- Use a process manager like PM2 for Node.js applications
+- Set up proper SSL certificates
+- Configure proper CORS settings
+- Set up proper logging and monitoring
+- Use a CDN for static assets
+- Implement proper security headers
+- Set up automated backups for the database
 
 ## Project Structure
 
